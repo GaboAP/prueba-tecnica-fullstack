@@ -22,7 +22,7 @@ class ProductRemoteDataSourceImpl
   Future<List<ProductModel>> getProducts() async {
     try {
       final url = Uri.parse(
-        'https://dummyjson.com/products?limit=200&delay=2000',
+        'https://dummyjson.com/products?limit=20&delay=2000',
       );
 
       final response = await client
