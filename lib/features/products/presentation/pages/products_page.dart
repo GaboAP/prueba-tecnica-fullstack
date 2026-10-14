@@ -115,23 +115,54 @@ class ProductsPage extends StatelessWidget {
           }
 
           // 5. Listado Exitoso de Productos (RF-01)
-          return ListView.builder(
-            itemCount: provider.products.length,
-            itemBuilder: (context, index) {
-              final product = provider.products[index];
-              return ListTile(
-                leading: Image.network(
-                  product.thumbnail,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image),
+// 5. Listado Exitoso de Productos y Chips (RF-01 y RF-03)
+          return Column(
+            children: [
+              // Muestra los chips arriba si hay etiquetas disponibles
+              if (provider.availableTopTags.isNotEmpty)
+                Container(
+                  height: 60,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: provider.availableTopTags.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final tag = provider.availableTopTags[index];
+                      final isSelected = provider.selectedTagFilter == tag;
+
+                      return ChoiceChip(
+                        label: Text(tag),
+                        selected: isSelected,
+                        onSelected: (_) => provider.toggleTagFilter(tag),
+                      );
+                    },
+                  ),
                 ),
-                title: Text(product.title),
-                subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
-              );
-            },
+
+              // Listado de productos filtrados abajo ocupando el resto de la pantalla
+              Expanded(
+                child: ListView.builder(
+                  itemCount: provider.filteredProducts.length, // 👈 Usamos filteredProducts
+                  itemBuilder: (context, index) {
+                    final product = provider.filteredProducts[index]; // 👈 Usamos filteredProducts
+                    return ListTile(
+                      leading: Image.network(
+                        product.thumbnail,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image),
+                      ),
+                      title: Text(product.title),
+                      subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
